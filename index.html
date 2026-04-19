@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Victoria's Secret</title>
-    <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap)" rel="stylesheet">
-    <link rel="stylesheet" href="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css)">
-    <script src="[telegram.org](https://telegram.org/js/telegram-web-app.js)"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         /* ======================== RESET ======================== */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -140,16 +140,18 @@
             background: var(--bg);
             height: var(--filter-h);
             padding: 10px 0 8px;
-            display: flex; align-items: center;
+            display: flex; align-items: center; gap: 0;
             transition: top 0.3s cubic-bezier(0.4,0,0.2,1);
         }
         .filter-bar.shifted-down {
             top: calc(var(--header-h) + var(--safe-t) + 58px);
         }
         .filter-scroll {
-            display: flex; gap: 8px; padding: 0 20px;
+            display: flex; gap: 8px; padding: 0 0 0 20px;
             overflow-x: auto; -webkit-overflow-scrolling: touch;
-            flex: 1;
+            flex: 1; min-width: 0;
+            -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+            mask-image: linear-gradient(to right, black 80%, transparent 100%);
         }
         .filter-scroll::-webkit-scrollbar { display: none; }
         .cat-chip {
@@ -163,21 +165,15 @@
             background: var(--text); color: var(--accent-t); border-color: var(--text);
         }
 
-        /* ── ИЗБРАННОЕ: всегда второй чип, особый стиль ── */
-        .cat-chip.fav-chip {
+        /* Закреплённый чип Избранного */
+        #favStickyChip {
+            flex-shrink: 0;
+            margin-right: 16px;
             display: inline-flex; align-items: center; gap: 5px;
-            /* Лёгкий розовый фон по умолчанию, чтобы выделялся */
-            border-color: #F0D4DC;
-            background: #FFF0F4;
-            color: var(--fav-color);
+            position: relative;
         }
-        .cat-chip.fav-chip i { font-size: 12px; }
-        .cat-chip.fav-chip.active {
-            background: var(--fav-color);
-            border-color: var(--fav-color);
-            color: #fff;
-        }
-        .cat-chip.fav-chip.active i { color: #ffc6c6; }
+        #favStickyChip i { font-size: 12px; }
+        #favStickyChip.active i { color: #F8C8CC; }
         .fav-chip-badge {
             background: var(--fav-color); color: #fff;
             font-size: 9px; font-weight: 700;
@@ -185,7 +181,6 @@
             display: none; align-items: center; justify-content: center;
             padding: 0 4px; margin-left: 2px;
         }
-        .cat-chip.fav-chip.active .fav-chip-badge { background: rgba(255,255,255,0.35); color: #fff; }
         .fav-chip-badge.visible { display: inline-flex; }
 
         /* ======================== MAIN ======================== */
@@ -220,7 +215,6 @@
             from { opacity: 0; transform: translateY(14px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .card-img-wrap {
             width: 100%; aspect-ratio: 3/4;
             background: var(--bg-warm); position: relative; overflow: hidden;
@@ -238,7 +232,6 @@
             opacity: 0; transition: opacity 0.6s ease;
         }
         .card-img-wrap.loaded img { opacity: 1; }
-
         .card-badge {
             position: absolute; top: 10px; left: 10px; z-index: 5;
             padding: 3px 10px; border-radius: 100px;
@@ -247,7 +240,6 @@
         .card-badge.type-new { background: var(--card); color: var(--accent); box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
         .card-badge.type-hit { background: var(--accent); color: var(--accent-t); }
         .card-badge.type-pre { background: #E8E0F0; color: #7B6B8D; }
-
         .card-fav-btn {
             position: absolute; top: 10px; right: 10px; z-index: 5;
             width: 34px; height: 34px; border-radius: 50%;
@@ -260,7 +252,6 @@
         .card-fav-btn:active { transform: scale(0.85); }
         .card-fav-btn.is-fav { color: var(--fav-color); }
         .card-fav-btn.is-fav i { font-weight: 900; }
-
         .card-add-btn {
             position: absolute; bottom: 10px; right: 10px; z-index: 5;
             min-width: 36px; height: 36px; border-radius: 50%;
@@ -276,7 +267,6 @@
         }
         @keyframes btnPop { 0%{transform:scale(1)} 50%{transform:scale(1.25)} 100%{transform:scale(1)} }
         .card-add-btn.pop-anim { animation: btnPop 0.25s ease; }
-
         .card-share-btn {
             position: absolute; bottom: 10px; left: 10px; z-index: 5;
             width: 34px; height: 34px; border-radius: 50%;
@@ -287,7 +277,6 @@
             transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
         }
         .card-share-btn:active { transform: scale(0.85); color: var(--accent); }
-
         .card-info { padding: 12px 14px 14px; }
         .card-name {
             font-family: 'Playfair Display', serif;
@@ -296,7 +285,6 @@
         }
         .card-price { font-size: 14.5px; font-weight: 600; color: var(--accent); }
         .card-price.is-preorder { font-size: 12.5px; font-weight: 500; color: #7B6B8D; font-style: italic; }
-
         .fly-dot {
             position: fixed; width: 14px; height: 14px; border-radius: 50%;
             background: var(--accent); z-index: 9999; pointer-events: none;
@@ -324,7 +312,6 @@
             font-size: 20px; font-weight: 500; margin-bottom: 8px;
         }
         .empty-desc { font-size: 14px; color: var(--text-sec); line-height: 1.5; max-width: 260px; }
-
         .contact-link {
             display: flex; justify-content: center; padding: 16px 0 4px;
         }
@@ -344,18 +331,24 @@
         }
         .overlay-backdrop.open { opacity: 1; pointer-events: auto; }
 
+        /* Панели — flex-контейнер, НЕ scrollable */
         .overlay-panel {
             position: fixed; inset: 0; z-index: 200;
             background: var(--bg);
             transform: translateX(100%);
             transition: transform 0.35s cubic-bezier(0.32,0.72,0,1);
-            overflow-y: auto; overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
+            display: flex; flex-direction: column;
         }
         .overlay-panel.open { transform: translateX(0); }
 
+        /* Scroll-область внутри панелей */
+        .panel-scroll-area {
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .panel-nav {
-            position: sticky; top: 0; z-index: 10;
+            flex-shrink: 0;
             height: calc(52px + var(--safe-t)); padding-top: var(--safe-t);
             display: flex; align-items: center; padding-left: 8px; padding-right: 16px;
             background: rgba(253,246,248,0.88);
@@ -379,9 +372,7 @@
             width: 100%; aspect-ratio: 3/4; max-height: 55vh;
             object-fit: cover; background: var(--bg-warm); display: block;
         }
-        .detail-body {
-            padding: 24px 22px 140px; /* ↑ увеличен нижний отступ, чтобы sticky-кнопка не перекрывала текст */
-        }
+        .detail-body { padding: 24px 22px 32px; }
         .detail-cat-label {
             font-size: 11px; font-weight: 600; text-transform: uppercase;
             letter-spacing: 1.5px; color: var(--text-tri); margin-bottom: 8px;
@@ -397,13 +388,12 @@
             font-size: 16px; font-weight: 500; color: #7B6B8D; font-style: italic;
         }
         .detail-product-desc { font-size: 14.5px; line-height: 1.7; color: var(--text-sec); }
+
+        /* Sticky bar — flex-элемент, НЕ position:fixed */
         .detail-sticky-bar {
-            position: sticky;   /* sticky вместо fixed — прилипает к низу панели, не к экрану */
-            bottom: 0;
-            z-index: 11;
+            flex-shrink: 0;
             padding: 16px 22px calc(16px + var(--safe-b));
             background: linear-gradient(to top, var(--bg) 60%, transparent);
-            margin-top: -80px; /* подтягиваем градиент вверх */
         }
         .detail-sticky-bar button {
             width: 100%; height: 54px; border-radius: var(--r-m);
@@ -455,7 +445,6 @@
             font-size: 13px; color: var(--text-tri); flex-shrink: 0; transition: color 0.2s;
         }
         .cart-item-del:active { color: var(--danger); }
-
         .cart-footer-bar {
             position: sticky; bottom: 0; z-index: 10;
             background: var(--bg); border-top: 1px solid var(--border);
@@ -567,7 +556,7 @@
 </head>
 <body>
 
-    <!-- ==================== HEADER ==================== -->
+    <!-- ==================== HEADER (z:110) ==================== -->
     <header class="app-header" id="appHeader">
         <div class="logo">VICTORIA'S SECRET</div>
         <div class="header-actions">
@@ -584,7 +573,7 @@
         </div>
     </header>
 
-    <!-- ==================== SEARCH ==================== -->
+    <!-- ==================== SEARCH (z:105) ==================== -->
     <div class="search-bar" id="searchBar">
         <input type="text" id="searchInput" placeholder="Поиск товаров..." autocomplete="off">
         <button class="search-close-btn" id="searchCloseBtn" aria-label="Закрыть поиск">
@@ -592,46 +581,58 @@
         </button>
     </div>
 
-    <!-- ==================== FILTERS ==================== -->
+    <!-- ==================== FILTERS (z:100) ==================== -->
     <div class="filter-bar" id="filterBar">
-        <div class="filter-scroll" id="filterScroll"></div>
+        <div class="filter-scroll" id="filterScroll">
+            <!-- Категории рендерятся через JS (без избранного) -->
+        </div>
+        <!-- Закреплённый чип Избранного — вне скролла -->
+        <button class="cat-chip" id="favStickyChip" aria-label="Избранное">
+            <i class="far fa-heart"></i> Избранное
+            <span class="fav-chip-badge" id="favChipBadge">0</span>
+        </button>
     </div>
 
     <!-- ==================== MAIN CONTENT ==================== -->
     <main class="main-content" id="mainContent"></main>
 
-    <!-- ==================== BACKDROP ==================== -->
+    <!-- ==================== BACKDROP (z:190) ==================== -->
     <div class="overlay-backdrop" id="overlayBackdrop"></div>
 
-    <!-- ==================== DETAIL PANEL ==================== -->
+    <!-- ==================== DETAIL PANEL (z:200) ==================== -->
     <div class="overlay-panel" id="detailPanel" role="dialog" aria-label="Детали товара">
         <div class="panel-nav">
             <button class="back-btn" id="detailBackBtn" aria-label="Назад"><i class="fas fa-arrow-left"></i></button>
             <button class="close-btn" id="detailCloseBtn" aria-label="Закрыть"><i class="fas fa-times"></i></button>
         </div>
-        <img class="detail-hero-img" id="detailImg" src="" alt="">
-        <div class="detail-body">
-            <div class="detail-cat-label" id="detailCatLabel"></div>
-            <h1 class="detail-product-name" id="detailName"></h1>
-            <div class="detail-product-price" id="detailPrice"></div>
-            <p class="detail-product-desc" id="detailDesc"></p>
+        <!-- Скроллируемая область -->
+        <div class="panel-scroll-area" id="detailScrollArea">
+            <img class="detail-hero-img" id="detailImg" src="" alt="">
+            <div class="detail-body">
+                <div class="detail-cat-label" id="detailCatLabel"></div>
+                <h1 class="detail-product-name" id="detailName"></h1>
+                <div class="detail-product-price" id="detailPrice"></div>
+                <p class="detail-product-desc" id="detailDesc"></p>
+            </div>
         </div>
+        <!-- Кнопка — отдельный flex-элемент, не скроллится -->
         <div class="detail-sticky-bar">
             <button id="detailAddBtn"><i class="fas fa-shopping-bag"></i> Добавить в корзину</button>
         </div>
     </div>
 
-    <!-- ==================== CART PANEL ==================== -->
+    <!-- ==================== CART PANEL (z:200) ==================== -->
     <div class="overlay-panel" id="cartPanel" role="dialog" aria-label="Корзина">
         <div class="panel-nav" style="border-bottom: 1px solid var(--border);">
             <button class="back-btn" id="cartBackBtn" aria-label="Назад"><i class="fas fa-arrow-left"></i></button>
             <span class="cart-nav-title">Корзина</span>
             <span class="cart-nav-count" id="cartNavCount"></span>
         </div>
-        <div id="cartContentArea"></div>
+        <!-- Скроллируемая область -->
+        <div class="panel-scroll-area" id="cartContentArea"></div>
     </div>
 
-    <!-- ==================== CHECKOUT MODAL ==================== -->
+    <!-- ==================== CHECKOUT MODAL (z:300) ==================== -->
     <div class="checkout-modal" id="checkoutModal" role="dialog" aria-label="Оформление заказа">
         <div class="checkout-modal-bg" id="checkoutModalBg"></div>
         <div class="checkout-sheet">
@@ -652,7 +653,7 @@
         </div>
     </div>
 
-    <!-- ==================== SUCCESS ==================== -->
+    <!-- ==================== SUCCESS (z:400) ==================== -->
     <div class="success-overlay" id="successOverlay">
         <div class="success-check-wrap">
             <svg viewBox="0 0 88 88">
@@ -670,7 +671,7 @@
         </div>
     </div>
 
-    <!-- ==================== TOAST ==================== -->
+    <!-- ==================== TOAST (z:5000) ==================== -->
     <div class="toast-element" id="toastElement"></div>
 
 
@@ -678,58 +679,54 @@
     /* ================================================================
        КОНФИГУРАЦИЯ
        ================================================================ */
-    const CHANNEL_LINK  = "[t.me](https://t.me/victorias_secret_shopby)";
-    const DIRECT_CHAT_LINK = "[t.me](https://t.me/victorias_secret_shopby?direct)";
-
-    // Deep-link base для "Поделиться": открывает Mini App сразу на нужном товаре
-    // Формат: [t.me](https://t.me/VSecret_shop_bot/VSecret_shop?startapp=product_)<id>
-    const APP_DEEPLINK_BASE = "[t.me](https://t.me/VSecret_shop_bot/VSecret_shop?startapp=product_)";
+    var CHANNEL_LINK = "https://t.me/victorias_secret_shopby";
+    var DIRECT_CHAT_LINK = "https://t.me/victorias_secret_shopby?direct";
+    /* Ссылка на приложение для deep-link с конкретным товаром */
+    var APP_BASE_URL = "https://t.me/VSecret_shop_bot/VSecret_shop";
 
     /* ================================================================
        ДАННЫЕ ТОВАРОВ
        ================================================================ */
-    const products = [
-        { id:1,  name:"Сумка Victoria Tote",         price:145, image:"[picsum.photos](https://picsum.photos/seed/vs-bag1/800/1067)", category:"bags",     shortDescription:"Практичная сумка на каждый день",           fullDescription:"Стильная и вместительная сумка Victoria's Secret из качественной эко-кожи. Идеально подходит для повседневного использования. Внутри карман на молнии, отделение для телефона. Логотип бренда выполнен из металлической фурнитуры.", badge:"new",  available:true  },
-        { id:2,  name:"Сумка через плечо Very Sexy", price:125, image:"[picsum.photos](https://picsum.photos/seed/vs-bag2/800/1067)", category:"bags",     shortDescription:"Элегантная сумка через плечо",              fullDescription:"Компактная и утончённая сумка через плечо из коллекции Very Sexy. Регулируемый ремень, качественная фурнитура в золотом тоне.", badge:undefined, available:true  },
-        { id:3,  name:"Мини-сумка Pink Collection",  price:105, image:"[picsum.photos](https://picsum.photos/seed/vs-bag3/800/1067)", category:"bags",     shortDescription:"Миниатюрная сумка с логотипом Pink",        fullDescription:"Очаровательная мини-сумка из коллекции Pink. Компактные размеры, но достаточно вместительная для необходимых мелочей.", badge:undefined, available:true  },
-        { id:4,  name:"Парфюм Bombshell EDP 50ml",   price:180, image:"[picsum.photos](https://picsum.photos/seed/vs-per1/800/1067)", category:"perfume",  shortDescription:"Иконический аромат с нотами пиона",         fullDescription:"Легендарный аромат Bombshell — бестселлер Victoria's Secret. Верхние ноты: танжерин, бергамот, лилия долины. Сердце: пион, орхидея.", badge:"hit",  available:true  },
-        { id:5,  name:"Парфюм Tease EDP 50ml",       price:165, image:"[picsum.photos](https://picsum.photos/seed/vs-per2/800/1067)", category:"perfume",  shortDescription:"Соблазнительный аромат с нотами гуавы",     fullDescription:"Tease — чувственный и утончённый аромат. Верхние ноты: груша, дикая малина, гуава. База: ваниль, мускус, сандал.", badge:undefined, available:true  },
-        { id:6,  name:"Бодимист Love Spell 250ml",   price:82,  image:"[picsum.photos](https://picsum.photos/seed/vs-per3/800/1067)", category:"perfume",  shortDescription:"Лёгкий бодимист с ароматом вишни",          fullDescription:"Love Spell — один из самых любимых бодимистов Victoria's Secret. Лёгкая формула с нотами вишнёвой ацеролы, фрезии и белого персика.", badge:undefined, available:false },
-        { id:7,  name:"Подарочный набор Bombshell",  price:275, image:"[picsum.photos](https://picsum.photos/seed/vs-set1/800/1067)", category:"sets",     shortDescription:"Полный набор с ароматом Bombshell",         fullDescription:"Роскошный подарочный набор Victoria's Secret с иконическим ароматом Bombshell. Парфюм EDP 50ml, лосьон для тела 250ml, гель для душа 250ml.", badge:"new",  available:true  },
-        { id:8,  name:"Подарочный набор Tease",      price:245, image:"[picsum.photos](https://picsum.photos/seed/vs-set2/800/1067)", category:"sets",     shortDescription:"Соблазнительный набор для ухода",          fullDescription:"Подарочный набор с ароматом Tease — идеальный подарок. Парфюм Tease EDP 50ml, крем для тела 200ml, молочко для тела 250ml.", badge:undefined, available:true  },
-        { id:9,  name:"Набор по уходу Pink",         price:145, image:"[picsum.photos](https://picsum.photos/seed/vs-set3/800/1067)", category:"sets",     shortDescription:"Набор для ухода с ароматом Pink",           fullDescription:"Бодрящий набор для ежедневного ухода из коллекции Pink. Гель для душа 250ml, лосьон для тела 250ml, бодимист 250ml.", badge:undefined, available:false },
-        { id:10, name:"Кошелёк Victoria Large",      price:92,  image:"[picsum.photos](https://picsum.photos/seed/vs-wal1/800/1067)", category:"wallets",  shortDescription:"Просторный кошелёк на молнии",              fullDescription:"Просторный женский кошелёк Victoria's Secret на молнии. Мягкая эко-кожа. Отделение для купюр, 8 карманов для карт, карман для монет.", badge:undefined, available:true  },
-        { id:11, name:"Кардхолдер Very Sexy",        price:58,  image:"[picsum.photos](https://picsum.photos/seed/vs-wal2/800/1067)", category:"wallets",  shortDescription:"Компактный кардхолдер на 6 карт",           fullDescription:"Минималистичный кардхолдер из коллекции Very Sexy. Компактный формат. 6 слотов для карт, центральное отделение.", badge:undefined, available:true  },
-        { id:12, name:"Клатч-кошелёк Pink",          price:72,  image:"[picsum.photos](https://picsum.photos/seed/vs-wal3/800/1067)", category:"wallets",  shortDescription:"Клатч с отделением для телефона",           fullDescription:"Стильный клатч-кошелёк из коллекции Pink. Вместительный, чтобы поместить телефон, карты и мелочи.", badge:undefined, available:false },
-        { id:13, name:"Бралет Body by VS",           price:98,  image:"[picsum.photos](https://picsum.photos/seed/vs-lin1/800/1067)", category:"lingerie", shortDescription:"Мягкий бралет без косточек",                fullDescription:"Нежный бралет из коллекции Body by Victoria's Secret. Без косточек — максимальный комфорт. Мягкий микромодал, тонкие бретели.", badge:undefined, available:true  },
-        { id:14, name:"Бюстгальтер Dream Angels",    price:115, image:"[picsum.photos](https://picsum.photos/seed/vs-lin2/800/1067)", category:"lingerie", shortDescription:"Бра с лёгкой поддержкой",                   fullDescription:"Бюстгальтер Dream Angels — сочетание красоты и комфорта. Лёгкая поддержка, нежное кружево, мягкие чашечки с памятью формы.", badge:"hit",  available:true  },
-        { id:15, name:"Комплект белья Very Sexy",    price:158, image:"[picsum.photos](https://picsum.photos/seed/vs-lin3/800/1067)", category:"lingerie", shortDescription:"Элегантный комплект из двух предметов",     fullDescription:"Роскошный комплект белья из коллекции Very Sexy. Бюстгальтер с push-up эффектом и трусики. Нежное кружево.", badge:undefined, available:true  },
-        { id:16, name:"Пижама Love Cloud",           price:135, image:"[picsum.photos](https://picsum.photos/seed/vs-paj1/800/1067)", category:"pajamas",  shortDescription:"Мягкая пижама из микрофибры",               fullDescription:"Нежная пижама Love Cloud из сверхмягкой микрофибры. Свободный крой. Топ на бретелях с кружевом, штаны с резинкой.", badge:"new",  available:true  },
-        { id:17, name:"Пижама Pink Sweet Dreams",    price:118, image:"[picsum.photos](https://picsum.photos/seed/vs-paj2/800/1067)", category:"pajamas",  shortDescription:"Короткая пижама с принтом Pink",            fullDescription:"Стильная короткая пижама из коллекции Pink. Футболка с логотипом и шортики. Хлопковый трикотаж.", badge:undefined, available:true  },
-        { id:18, name:"Пижама Dream Angels",         price:155, image:"[picsum.photos](https://picsum.photos/seed/vs-paj3/800/1067)", category:"pajamas",  shortDescription:"Шёлковая пижама с кружевом",                fullDescription:"Роскошная пижама Dream Angels из шелковистой ткани. Рубашка с пуговицами и кружевом, длинные брюки.", badge:undefined, available:false }
+    var products = [
+        { id:1, name:"Клатч Victoria Secret", price:160, image:"https://raw.githubusercontent.com/vladslashevski/Victoria-s-Secret/refs/heads/main/images/2.jpg", category:"bags", shortDescription:"Практичный клатч на каждый день", fullDescription:"Компактный, с верхней молнией и удобной ручкой-петлёй — носить можно на запястье или в руке. Сделан из плетёного искусственного кожзама. Снаружи: прорези для карт, удобно доставать проездной или карту. Внутри: карман на молнии для мелочи", badge:"new", available:true },        
+        { id:2, name:"Сумка PINK The Takeaway", price:160, image:"https://raw.githubusercontent.com/vladslashevski/Victoria-s-Secret/refs/heads/main/images/8.jpg", category:"bags", shortDescription:"Очаровательная мини-сумка из коллекции Pink", fullDescription:"Очаровательная мини-сумка из коллекции Pink. Компактные размеры, но достаточно вместительная для необходимых вещей. Регулируемый ремень, снаружи клапан на пряжке. Внутри: плоский карман и ещё одна застёжка-пряжка для мелочей. Размеры: 20 см в длину, 5.5 см в ширину, 11.5 см в высоту", badge:"new", available:true },        
+        { id:3, name:"Сумка на пояс / через плечо", price:150, image:"https://raw.githubusercontent.com/vladslashevski/Victoria-s-Secret/refs/heads/main/images/7.jpg", category:"bags", shortDescription:"VSX Belt Bag", fullDescription:"Ничего не держи в руках — просто наслаждайся движением. Лаконичный дизайн делает эту вещь стильным фаворитом в любой поездке. Размеры: 35.5 см в длину, 3.5 см в ширину, 14 см в высоту. Ремень регулируется, застёгивается пряжкой. Можно носить на поясе или через плечо", badge:"new", available:true },        
+        { id:4, name:"Парфюм Bombshell EDP 50ml", price:180, image:"https://picsum.photos/seed/vs-per1/800/1067", category:"perfume", shortDescription:"Иконический аромат с нотами пиона", fullDescription:"Легендарный аромат Bombshell — бестселлер Victoria's Secret. Верхние ноты: танжерин, бергамот, лилия долины. Сердце: пион, орхидея.", badge:"hit", available:true },
+        { id:5, name:"Парфюм Tease EDP 50ml", price:165, image:"https://picsum.photos/seed/vs-per2/800/1067", category:"perfume", shortDescription:"Соблазнительный аромат с нотами гуавы", fullDescription:"Tease — чувственный и утончённый аромат. Верхние ноты: груша, дикая малина, гуава. База: ваниль, мускус, сандал.", badge:undefined, available:true },
+        { id:6, name:"Бодимист Love Spell 250ml", price:82, image:"https://picsum.photos/seed/vs-per3/800/1067", category:"perfume", shortDescription:"Лёгкий бодимист с ароматом вишни", fullDescription:"Love Spell — один из самых любимых бодимистов Victoria's Secret. Лёгкая формула с нотами вишнёвой ацеролы, фрезии и белого персика.", badge:undefined, available:false },
+        { id:7, name:"Подарочный набор Bombshell", price:275, image:"https://picsum.photos/seed/vs-set1/800/1067", category:"sets", shortDescription:"Полный набор с ароматом Bombshell", fullDescription:"Роскошный подарочный набор Victoria's Secret с иконическим ароматом Bombshell. Парфюм EDP 50ml, лосьон для тела 250ml, гель для душа 250ml.", badge:"new", available:true },
+        { id:8, name:"Подарочный набор Tease", price:245, image:"https://picsum.photos/seed/vs-set2/800/1067", category:"sets", shortDescription:"Соблазнительный набор для ухода", fullDescription:"Подарочный набор с ароматом Tease — идеальный подарок. Парфюм Tease EDP 50ml, крем для тела 200ml, молочко для тела 250ml.", badge:undefined, available:true },
+        { id:9, name:"Набор по уходу Pink", price:145, image:"https://picsum.photos/seed/vs-set3/800/1067", category:"sets", shortDescription:"Набор для ухода с ароматом Pink", fullDescription:"Бодрящий набор для ежедневного ухода из коллекции Pink. Гель для душа 250ml, лосьон для тела 250ml, бодимист 250ml.", badge:undefined, available:false },
+        { id:10, name:"Кошелёк Victoria Large", price:92, image:"https://picsum.photos/seed/vs-wal1/800/1067", category:"wallets", shortDescription:"Просторный кошелёк на молнии", fullDescription:"Просторный женский кошелёк Victoria's Secret на молнии. Мягкая эко-кожа. Отделение для купюр, 8 карманов для карт, карман для монет.", badge:undefined, available:true },
+        { id:11, name:"Кардхолдер Very Sexy", price:58, image:"https://picsum.photos/seed/vs-wal2/800/1067", category:"wallets", shortDescription:"Компактный кардхолдер на 6 карт", fullDescription:"Минималистичный кардхолдер из коллекции Very Sexy. Компактный формат. 6 слотов для карт, центральное отделение.", badge:undefined, available:true },
+        { id:12, name:"Клатч-кошелёк Pink", price:72, image:"https://picsum.photos/seed/vs-wal3/800/1067", category:"wallets", shortDescription:"Клатч с отделением для телефона", fullDescription:"Стильный клатч-кошелёк из коллекции Pink. Вместительный, чтобы поместить телефон, карты и мелочи.", badge:undefined, available:false },
+        { id:13, name:"Бралет Body by VS", price:98, image:"https://picsum.photos/seed/vs-lin1/800/1067", category:"lingerie", shortDescription:"Мягкий бралет без косточек", fullDescription:"Нежный бралет из коллекции Body by Victoria's Secret. Без косточек — максимальный комфорт. Мягкий микромодал, тонкие бретели.", badge:undefined, available:true },
+        { id:14, name:"Бюстгальтер Dream Angels", price:115, image:"https://picsum.photos/seed/vs-lin2/800/1067", category:"lingerie", shortDescription:"Бра с лёгкой поддержкой", fullDescription:"Бюстгальтер Dream Angels — сочетание красоты и комфорта. Лёгкая поддержка, нежное кружево, мягкие чашечки с памятью формы.", badge:"hit", available:true },
+        { id:15, name:"Комплект белья Very Sexy", price:158, image:"https://picsum.photos/seed/vs-lin3/800/1067", category:"lingerie", shortDescription:"Элегантный комплект из двух предметов", fullDescription:"Роскошный комплект белья из коллекции Very Sexy. Бюстгальтер с push-up эффектом и трусики. Нежное кружево.", badge:undefined, available:true },
+        { id:16, name:"Пижама Love Cloud", price:135, image:"https://picsum.photos/seed/vs-paj1/800/1067", category:"pajamas", shortDescription:"Мягкая пижама из микрофибры", fullDescription:"Нежная пижама Love Cloud из сверхмягкой микрофибры. Свободный крой. Топ на бретелях с кружевом, штаны с резинкой.", badge:"new", available:true },
+        { id:17, name:"Пижама Pink Sweet Dreams", price:118, image:"https://picsum.photos/seed/vs-paj2/800/1067", category:"pajamas", shortDescription:"Короткая пижама с принтом Pink", fullDescription:"Стильная короткая пижама из коллекции Pink. Футболка с логотипом и шортики. Хлопковый трикотаж.", badge:undefined, available:true },
+        { id:18, name:"Пижама Dream Angels", price:155, image:"https://picsum.photos/seed/vs-paj3/800/1067", category:"pajamas", shortDescription:"Шёлковая пижама с кружевом", fullDescription:"Роскошная пижама Dream Angels из шелковистой ткани. Рубашка с пуговицами и кружевом, длинные брюки.", badge:undefined, available:false }
     ];
 
-    /* Порядок фильтров: «Все» → «Избранное» → категории */
-    const categoryDefs = [
-        { key: "all",      label: "Все" },
-        { key: "fav",      label: "Избранное", isFav: true },   // ← закреплено вторым
-        { key: "bags",     label: "Сумки" },
-        { key: "perfume",  label: "Духи" },
-        { key: "sets",     label: "Наборы" },
-        { key: "wallets",  label: "Кошельки" },
+    var categoryDefs = [
+        { key: "all", label: "Все" },
+        { key: "bags", label: "Сумки" },
+        { key: "perfume", label: "Духи" },
+        { key: "sets", label: "Наборы" },
+        { key: "wallets", label: "Кошельки" },
         { key: "lingerie", label: "Бельё" },
-        { key: "pajamas",  label: "Пижамы" }
+        { key: "pajamas", label: "Пижамы" }
     ];
 
-    const categoryLabels = {
+    var categoryLabels = {
         bags: "Сумки", perfume: "Духи", sets: "Наборы",
         wallets: "Кошельки", lingerie: "Бельё", pajamas: "Пижамы"
     };
 
     /* ================================================================
-       СОСТОЯНИЕ
+       СОСТОЯНИЕ ПРИЛОЖЕНИЯ
        ================================================================ */
-    const state = {
+    var state = {
         currentView: "catalog",
         selectedCategory: "all",
         sortMode: "none",
@@ -743,19 +740,25 @@
     /* ================================================================
        TELEGRAM WEB APP
        ================================================================ */
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    var tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
     if (tg) {
         tg.ready();
         tg.expand();
-        try { tg.setHeaderColor("#FDF6F8"); tg.setBackgroundColor("#FDF6F8"); } catch (e) {}
+        try {
+            tg.setHeaderColor("#FDF6F8");
+            tg.setBackgroundColor("#FDF6F8");
+        } catch (e) {}
         tg.BackButton.onClick(function() { navigateBack(); });
     }
 
     function updateTelegramBackButton() {
         if (!tg || !tg.BackButton) return;
-        if (state.currentView !== "catalog") tg.BackButton.show();
-        else tg.BackButton.hide();
+        if (state.currentView !== "catalog") {
+            tg.BackButton.show();
+        } else {
+            tg.BackButton.hide();
+        }
     }
 
     /* ================================================================
@@ -764,29 +767,59 @@
     function saveToStorage(key, data) {
         try { localStorage.setItem("vs_" + key, JSON.stringify(data)); } catch (e) {}
     }
+
     function loadFromStorage(key) {
-        try { var r = localStorage.getItem("vs_" + key); return r ? JSON.parse(r) : null; } catch (e) { return null; }
+        try {
+            var raw = localStorage.getItem("vs_" + key);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
     }
 
     /* ================================================================
        УТИЛИТЫ
        ================================================================ */
-    function formatPrice(amount) { return amount.toLocaleString("ru-RU") + " Br"; }
-    function getCartTotal() { return state.cart.reduce(function(s, i) { return s + i.product.price * i.quantity; }, 0); }
-    function getCartItemCount() { return state.cart.reduce(function(s, i) { return s + i.quantity; }, 0); }
-    function isFavorite(id) { return state.favorites.indexOf(id) > -1; }
-    function findCartItem(id) { return state.cart.find(function(i) { return i.product.id === id; }); }
-    function findProduct(id) { return products.find(function(p) { return p.id === id; }); }
+    function formatPrice(amount) {
+        return amount.toLocaleString("ru-RU") + " Br";
+    }
+
+    function getCartTotal() {
+        return state.cart.reduce(function(sum, item) { return sum + item.product.price * item.quantity; }, 0);
+    }
+
+    function getCartItemCount() {
+        return state.cart.reduce(function(sum, item) { return sum + item.quantity; }, 0);
+    }
+
+    function isFavorite(id) {
+        return state.favorites.indexOf(id) > -1;
+    }
+
+    function findCartItem(id) {
+        return state.cart.find(function(item) { return item.product.id === id; });
+    }
+
+    function findProduct(id) {
+        return products.find(function(p) { return p.id === id; });
+    }
 
     function openChannelChat() {
-        if (tg && tg.openTelegramLink) tg.openTelegramLink(DIRECT_CHAT_LINK);
-        else window.open(DIRECT_CHAT_LINK, "_blank");
+        if (tg && tg.openTelegramLink) {
+            tg.openTelegramLink(DIRECT_CHAT_LINK);
+        } else {
+            window.open(DIRECT_CHAT_LINK, "_blank");
+        }
+    }
+
+    /* Генерация deep-link на конкретный товар */
+    function getProductDeepLink(productId) {
+        return APP_BASE_URL + "?startapp=product_" + productId;
     }
 
     /* ================================================================
        ТОСТ
        ================================================================ */
     var toastTimer = null;
+
     function showToast(message) {
         var el = document.getElementById("toastElement");
         el.textContent = message;
@@ -813,31 +846,33 @@
     }
 
     /* ================================================================
-       АНИМАЦИЯ «ПОЛЁТ В КОРЗИНУ»
+       АНИМАЦИЯ ПОЛЁТ В КОРЗИНУ
        ================================================================ */
-    function animateFlyToCart(fromEl) {
-        var fr = fromEl.getBoundingClientRect();
-        var to = document.getElementById("cartBadge").getBoundingClientRect();
+    function animateFlyToCart(fromElement) {
+        var fromRect = fromElement.getBoundingClientRect();
+        var toEl = document.getElementById("cartBadge");
+        var toRect = toEl.getBoundingClientRect();
+
         var dot = document.createElement("div");
         dot.className = "fly-dot";
-        dot.style.left = (fr.left + fr.width / 2 - 7) + "px";
-        dot.style.top  = (fr.top  + fr.height / 2 - 7) + "px";
+        dot.style.left = (fromRect.left + fromRect.width / 2 - 7) + "px";
+        dot.style.top = (fromRect.top + fromRect.height / 2 - 7) + "px";
         document.body.appendChild(dot);
+
         requestAnimationFrame(function() {
             requestAnimationFrame(function() {
-                dot.style.left = (to.left + to.width / 2 - 7) + "px";
-                dot.style.top  = (to.top  + to.height / 2 - 7) + "px";
+                dot.style.left = (toRect.left + toRect.width / 2 - 7) + "px";
+                dot.style.top = (toRect.top + toRect.height / 2 - 7) + "px";
                 dot.style.transform = "scale(0.3)";
                 dot.style.opacity = "0.2";
             });
         });
+
         setTimeout(function() { dot.remove(); }, 500);
     }
 
     /* ================================================================
-       РЕНДЕР: ФИЛЬТР-БАР
-       Избранное теперь генерируется вместе с остальными чипами
-       через categoryDefs — всегда на второй позиции.
+       РЕНДЕР: ФИЛЬТР-БАР (только категории, без избранного)
        ================================================================ */
     function renderFilterBar() {
         var scroll = document.getElementById("filterScroll");
@@ -845,20 +880,8 @@
 
         for (var i = 0; i < categoryDefs.length; i++) {
             var cat = categoryDefs[i];
-            var isActive = state.selectedCategory === cat.key;
-            var activeClass = isActive ? " active" : "";
-
-            if (cat.isFav) {
-                // Специальный чип «Избранное»
-                var favCount = state.favorites.length;
-                var badgeHtml = '<span class="fav-chip-badge' + (favCount > 0 ? ' visible' : '') + '">' + favCount + '</span>';
-                var heartIcon = (isActive || state.favorites.length > 0) ? 'fas' : 'far';
-                html += '<button class="cat-chip fav-chip' + activeClass + '" data-category="fav">'
-                      + '<i class="' + heartIcon + ' fa-heart"></i> ' + cat.label + badgeHtml
-                      + '</button>';
-            } else {
-                html += '<button class="cat-chip' + activeClass + '" data-category="' + cat.key + '">' + cat.label + '</button>';
-            }
+            var activeClass = state.selectedCategory === cat.key ? " active" : "";
+            html += '<button class="cat-chip' + activeClass + '" data-category="' + cat.key + '">' + cat.label + '</button>';
         }
 
         scroll.innerHTML = html;
@@ -868,21 +891,42 @@
             chips[j].addEventListener("click", function() {
                 state.selectedCategory = this.getAttribute("data-category");
                 renderFilterBar();
+                updateFavStickyChip();
                 renderCatalog();
             });
         }
     }
 
-    function updateFavChipBadge() {
-        var badge = document.querySelector(".fav-chip-badge");
-        if (!badge) return;
+    /* Обновить закреплённый чип избранного */
+    function updateFavStickyChip() {
+        var chip = document.getElementById("favStickyChip");
+        var badge = document.getElementById("favChipBadge");
         var count = state.favorites.length;
+        var isActive = state.selectedCategory === "fav";
+
+        if (isActive) {
+            chip.classList.add("active");
+        } else {
+            chip.classList.remove("active");
+        }
+
         badge.textContent = count;
-        if (count > 0) badge.classList.add("visible");
-        else badge.classList.remove("visible");
-        // Обновить иконку сердца
-        var icon = document.querySelector(".fav-chip i");
-        if (icon) icon.className = count > 0 ? 'fas fa-heart' : 'far fa-heart';
+        if (count > 0) {
+            badge.classList.add("visible");
+        } else {
+            badge.classList.remove("visible");
+        }
+
+        var icon = chip.querySelector("i");
+        if (icon) {
+            if (isActive) {
+                icon.className = "fas fa-heart";
+            } else if (count > 0) {
+                icon.className = "fas fa-heart";
+            } else {
+                icon.className = "far fa-heart";
+            }
+        }
     }
 
     /* ================================================================
@@ -890,11 +934,13 @@
        ================================================================ */
     function getFilteredProducts() {
         var list = products.slice();
+
         if (state.selectedCategory === "fav") {
             list = list.filter(function(p) { return state.favorites.indexOf(p.id) > -1; });
         } else if (state.selectedCategory !== "all") {
             list = list.filter(function(p) { return p.category === state.selectedCategory; });
         }
+
         if (state.searchQuery.trim()) {
             var q = state.searchQuery.toLowerCase().trim();
             list = list.filter(function(p) {
@@ -903,8 +949,13 @@
                        (categoryLabels[p.category] || "").toLowerCase().indexOf(q) > -1;
             });
         }
-        if (state.sortMode === "asc") list.sort(function(a,b) { return a.price - b.price; });
-        else if (state.sortMode === "desc") list.sort(function(a,b) { return b.price - a.price; });
+
+        if (state.sortMode === "asc") {
+            list.sort(function(a, b) { return a.price - b.price; });
+        } else if (state.sortMode === "desc") {
+            list.sort(function(a, b) { return b.price - a.price; });
+        }
+
         return list;
     }
 
@@ -913,7 +964,7 @@
         var main = document.getElementById("mainContent");
 
         if (filtered.length === 0) {
-            var isFav    = state.selectedCategory === "fav";
+            var isFav = state.selectedCategory === "fav";
             var isSearch = state.searchQuery.trim().length > 0;
             main.innerHTML =
                 '<div class="empty-state">' +
@@ -925,19 +976,20 @@
         }
 
         var html = '<div class="product-grid">';
+
         for (var i = 0; i < filtered.length; i++) {
             var p = filtered[i];
 
             var badgeHtml = '';
-            if (!p.available)       badgeHtml = '<span class="card-badge type-pre">Под заказ</span>';
-            else if (p.badge==="new") badgeHtml = '<span class="card-badge type-new">Новинка</span>';
-            else if (p.badge==="hit") badgeHtml = '<span class="card-badge type-hit">Хит</span>';
+            if (!p.available) badgeHtml = '<span class="card-badge type-pre">Под заказ</span>';
+            else if (p.badge === "new") badgeHtml = '<span class="card-badge type-new">Новинка</span>';
+            else if (p.badge === "hit") badgeHtml = '<span class="card-badge type-hit">Хит</span>';
 
             var favClass = isFavorite(p.id) ? ' is-fav' : '';
-            var favIcon  = isFavorite(p.id) ? 'fas' : 'far';
+            var favIcon = isFavorite(p.id) ? 'fas' : 'far';
 
             var cartItem = findCartItem(p.id);
-            var addClass  = cartItem ? ' in-cart' : '';
+            var addClass = cartItem ? ' in-cart' : '';
             var addContent = cartItem ? cartItem.quantity : '<i class="fas fa-plus"></i>';
 
             var priceHtml = p.available
@@ -959,10 +1011,13 @@
                     '</div>' +
                 '</article>';
         }
+
         html += '</div>';
         html += '<div class="contact-link"><button id="contactLinkBtn"><i class="fab fa-telegram-plane"></i> Написать нам</button></div>';
+
         main.innerHTML = html;
 
+        // Обработчики на карточки
         var cards = main.querySelectorAll(".product-card");
         for (var c = 0; c < cards.length; c++) {
             (function(card) {
@@ -979,6 +1034,7 @@
             })(cards[c]);
         }
 
+        // Сердечки
         var favBtns = main.querySelectorAll(".card-fav-btn");
         for (var f = 0; f < favBtns.length; f++) {
             (function(btn) {
@@ -989,6 +1045,7 @@
             })(favBtns[f]);
         }
 
+        // Кнопки +
         var addBtns = main.querySelectorAll(".card-add-btn");
         for (var a = 0; a < addBtns.length; a++) {
             (function(btn) {
@@ -999,6 +1056,7 @@
             })(addBtns[a]);
         }
 
+        // Кнопки «Поделиться»
         var shareBtns = main.querySelectorAll(".card-share-btn");
         for (var s = 0; s < shareBtns.length; s++) {
             (function(btn) {
@@ -1009,6 +1067,7 @@
             })(shareBtns[s]);
         }
 
+        // Кнопка «Написать нам»
         var contactBtn = main.querySelector("#contactLinkBtn");
         if (contactBtn) contactBtn.addEventListener("click", openChannelChat);
     }
@@ -1018,78 +1077,113 @@
        ================================================================ */
     function toggleFavorite(id) {
         var idx = state.favorites.indexOf(id);
-        if (idx > -1) { state.favorites.splice(idx, 1); showToast("Удалено из избранного"); }
-        else          { state.favorites.push(id);        showToast("Добавлено в избранное"); }
+        if (idx > -1) {
+            state.favorites.splice(idx, 1);
+            showToast("Удалено из избранного");
+        } else {
+            state.favorites.push(id);
+            showToast("Добавлено в избранное");
+        }
         saveToStorage("favorites", state.favorites);
         updateFavButtonsOnCards();
-        updateFavChipBadge();
-        if (state.selectedCategory === "fav") renderCatalog();
+        updateFavStickyChip();
+        if (state.selectedCategory === "fav") {
+            renderCatalog();
+        }
     }
 
     function updateFavButtonsOnCards() {
         var btns = document.querySelectorAll(".card-fav-btn");
         for (var i = 0; i < btns.length; i++) {
             var id = parseInt(btns[i].getAttribute("data-fav-id"));
-            if (isFavorite(id)) { btns[i].classList.add("is-fav"); btns[i].innerHTML = '<i class="fas fa-heart"></i>'; }
-            else                { btns[i].classList.remove("is-fav"); btns[i].innerHTML = '<i class="far fa-heart"></i>'; }
-        }
-    }
-
-    /* ================================================================
-       ПОДЕЛИТЬСЯ
-       Формирует deep link, открывающий Mini App сразу на товаре.
-       Текст с названием и ценой прикрепляется как подпись.
-       ================================================================ */
-    function shareProduct(id) {
-        var p = findProduct(id);
-        if (!p) return;
-
-        var appUrl = APP_DEEPLINK_BASE + p.id;                     // прямая ссылка на товар
-        var text   = p.name + " — " + formatPrice(p.price) + "\n" + p.shortDescription;
-
-        // Стандартный Telegram share: открывает диалог с предзаполненным текстом + ссылкой
-        var shareUrl = "[t.me](https://t.me/share/url?url=)" + encodeURIComponent(appUrl)
-                     + "&text=" + encodeURIComponent(text);
-
-        if (tg && tg.openTelegramLink) {
-            tg.openTelegramLink(shareUrl);
-        } else if (navigator.share) {
-            navigator.share({ title: p.name, text: text, url: appUrl });
-        } else {
-            // Fallback: копируем в буфер
-            var fullText = text + "\n" + appUrl;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(fullText).then(function() { showToast("Скопировано в буфер"); });
+            if (isFavorite(id)) {
+                btns[i].classList.add("is-fav");
+                btns[i].innerHTML = '<i class="fas fa-heart"></i>';
             } else {
-                var ta = document.createElement("textarea");
-                ta.value = fullText; ta.style.position = "fixed"; ta.style.opacity = "0";
-                document.body.appendChild(ta); ta.select(); document.execCommand("copy");
-                document.body.removeChild(ta); showToast("Скопировано в буфер");
+                btns[i].classList.remove("is-fav");
+                btns[i].innerHTML = '<i class="far fa-heart"></i>';
             }
         }
     }
 
     /* ================================================================
-       ДОБАВИТЬ В КОРЗИНУ (с карточки)
+       ПОДЕЛИТЬСЯ — deep-link на конкретный товар
+       ================================================================ */
+    function shareProduct(id) {
+        var p = findProduct(id);
+        if (!p) return;
+
+        /* Формируем красивое карточко-подобное сообщение */
+        var statusText = p.available ? "" : " (Под заказ)";
+        var text =
+            "\u2728 Victoria's Secret\n\n" +
+            "\uD83D\uDCDE " + p.name + statusText + "\n" +
+            "\uD83D\uDCB0 " + formatPrice(p.price) + "\n" +
+            "\uD83D\uDCDD " + p.shortDescription + "\n\n" +
+            "\u2B07\uFE0F Открыть товар";
+
+        var productUrl = getProductDeepLink(id);
+
+        if (tg && tg.openTelegramLink) {
+            /* Внутри Telegram — используем share/url для выбора чата */
+            var shareLink = "https://t.me/share/url?url=" + encodeURIComponent(productUrl) + "&text=" + encodeURIComponent(text);
+            tg.openTelegramLink(shareLink);
+        } else if (navigator.share) {
+            /* За пределами Telegram — нативный share */
+            navigator.share({
+                title: p.name + " — Victoria's Secret",
+                text: text,
+                url: productUrl
+            }).catch(function() {});
+        } else {
+            /* Fallback — копируем в буфер */
+            var fullText = text + "\n" + productUrl;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fullText).then(function() { showToast("Скопировано в буфер"); });
+            } else {
+                var ta = document.createElement("textarea");
+                ta.value = fullText;
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+                showToast("Скопировано в буфер");
+            }
+        }
+    }
+
+    /* ================================================================
+       ДОБАВИТЬ В КОРЗИНУ
        ================================================================ */
     function addToCartFromCard(id, buttonEl) {
         var product = findProduct(id);
         if (!product) return;
+
         var existing = findCartItem(id);
-        if (existing) existing.quantity++;
-        else state.cart.push({ product: product, quantity: 1 });
+        if (existing) {
+            existing.quantity++;
+        } else {
+            state.cart.push({ product: product, quantity: 1 });
+        }
+
         saveToStorage("cart", state.cart);
         updateCartBadge();
         animateFlyToCart(buttonEl);
+
         buttonEl.classList.remove("pop-anim");
         void buttonEl.offsetWidth;
         buttonEl.classList.add("pop-anim");
+
         updateAddButtonsOnCards();
+
         if (state.selectedProduct && state.selectedProduct.id === id) {
             var detailBtn = document.getElementById("detailAddBtn");
             detailBtn.innerHTML = '<i class="fas fa-shopping-bag"></i> Уже в корзине';
             detailBtn.classList.add("is-added");
         }
+
         showToast("Добавлено в корзину");
     }
 
@@ -1098,13 +1192,18 @@
         for (var i = 0; i < btns.length; i++) {
             var id = parseInt(btns[i].getAttribute("data-add-id"));
             var item = findCartItem(id);
-            if (item) { btns[i].classList.add("in-cart"); btns[i].textContent = item.quantity; }
-            else      { btns[i].classList.remove("in-cart"); btns[i].innerHTML = '<i class="fas fa-plus"></i>'; }
+            if (item) {
+                btns[i].classList.add("in-cart");
+                btns[i].textContent = item.quantity;
+            } else {
+                btns[i].classList.remove("in-cart");
+                btns[i].innerHTML = '<i class="fas fa-plus"></i>';
+            }
         }
     }
 
     /* ================================================================
-       ПРОСМОТР ТОВАРА (детали)
+       ПРОСМОТР ТОВАРА
        ================================================================ */
     function openProductDetail(product) {
         state.selectedProduct = product;
@@ -1133,7 +1232,8 @@
 
         document.getElementById("overlayBackdrop").classList.add("open");
         document.getElementById("detailPanel").classList.add("open");
-        document.getElementById("detailPanel").scrollTop = 0;
+        /* Скроллим область с контентом, а не панель */
+        document.getElementById("detailScrollArea").scrollTop = 0;
     }
 
     function closeProductDetail() {
@@ -1153,7 +1253,7 @@
         updateTelegramBackButton();
         document.getElementById("overlayBackdrop").classList.add("open");
         document.getElementById("cartPanel").classList.add("open");
-        document.getElementById("cartPanel").scrollTop = 0;
+        document.getElementById("cartContentArea").scrollTop = 0;
         renderCartContent();
     }
 
@@ -1177,7 +1277,10 @@
         var item = findCartItem(id);
         if (!item) return;
         item.quantity += delta;
-        if (item.quantity <= 0) { removeFromCart(id); return; }
+        if (item.quantity <= 0) {
+            removeFromCart(id);
+            return;
+        }
         saveToStorage("cart", state.cart);
         updateCartBadge();
         updateAddButtonsOnCards();
@@ -1200,6 +1303,7 @@
         }
 
         var html = '<div class="cart-items-list">';
+
         for (var i = 0; i < state.cart.length; i++) {
             var item = state.cart[i];
             html +=
@@ -1210,22 +1314,27 @@
                         '<div class="cart-item-row">' +
                             '<div class="cart-item-price">' + formatPrice(item.product.price * item.quantity) + '</div>' +
                             '<div class="qty-controls">' +
-                                '<button class="qty-btn" data-qty-id="' + item.product.id + '" data-qty-delta="-1"><i class="fas fa-minus" style="font-size:10px"></i></button>' +
+                                '<button class="qty-btn" data-qty-id="' + item.product.id + '" data-qty-delta="-1" aria-label="Минус"><i class="fas fa-minus" style="font-size:10px"></i></button>' +
                                 '<span class="qty-value">' + item.quantity + '</span>' +
-                                '<button class="qty-btn" data-qty-id="' + item.product.id + '" data-qty-delta="1"><i class="fas fa-plus" style="font-size:10px"></i></button>' +
+                                '<button class="qty-btn" data-qty-id="' + item.product.id + '" data-qty-delta="1" aria-label="Плюс"><i class="fas fa-plus" style="font-size:10px"></i></button>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<button class="cart-item-del" data-del-id="' + item.product.id + '"><i class="fas fa-trash-alt"></i></button>' +
+                    '<button class="cart-item-del" data-del-id="' + item.product.id + '" aria-label="Удалить"><i class="fas fa-trash-alt"></i></button>' +
                 '</div>';
         }
+
         html += '</div>';
         html +=
             '<div class="cart-footer-bar">' +
                 '<div class="cart-delivery-note">Доставка оплачивается отдельно клиентом</div>' +
-                '<div class="cart-total-row"><span class="cart-total-label">Итого</span><span class="cart-total-value">' + formatPrice(getCartTotal()) + '</span></div>' +
+                '<div class="cart-total-row">' +
+                    '<span class="cart-total-label">Итого</span>' +
+                    '<span class="cart-total-value">' + formatPrice(getCartTotal()) + '</span>' +
+                '</div>' +
                 '<button class="checkout-open-btn" id="checkoutOpenBtn">Оформить заказ <i class="fas fa-arrow-right" style="font-size:12px"></i></button>' +
             '</div>';
+
         el.innerHTML = html;
 
         var qtyBtns = el.querySelectorAll(".qty-btn");
@@ -1240,7 +1349,9 @@
         var delBtns = el.querySelectorAll(".cart-item-del");
         for (var d = 0; d < delBtns.length; d++) {
             (function(btn) {
-                btn.addEventListener("click", function() { removeFromCart(parseInt(btn.getAttribute("data-del-id"))); });
+                btn.addEventListener("click", function() {
+                    removeFromCart(parseInt(btn.getAttribute("data-del-id")));
+                });
             })(delBtns[d]);
         }
 
@@ -1253,13 +1364,17 @@
        ================================================================ */
     function openCheckoutModal() {
         document.getElementById("checkoutModal").classList.add("open");
+
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
             var user = tg.initDataUnsafe.user;
-            if (user.first_name && !document.getElementById("nameInput").value)
+            if (user.first_name && !document.getElementById("nameInput").value) {
                 document.getElementById("nameInput").value = user.first_name + (user.last_name ? " " + user.last_name : "");
-            if (user.username && !document.getElementById("tgInput").value)
+            }
+            if (user.username && !document.getElementById("tgInput").value) {
                 document.getElementById("tgInput").value = "@" + user.username;
+            }
         }
+
         setTimeout(function() {
             if (!document.getElementById("nameInput").value) document.getElementById("nameInput").focus();
             else if (!document.getElementById("tgInput").value) document.getElementById("tgInput").focus();
@@ -1272,30 +1387,53 @@
     }
 
     function clearFormErrors() {
-        document.querySelectorAll(".form-input").forEach(function(el) { el.classList.remove("has-error"); });
-        document.querySelectorAll(".form-error-msg").forEach(function(el) { el.classList.remove("visible"); });
+        var inputs = document.querySelectorAll(".form-input");
+        for (var i = 0; i < inputs.length; i++) inputs[i].classList.remove("has-error");
+        var errors = document.querySelectorAll(".form-error-msg");
+        for (var j = 0; j < errors.length; j++) errors[j].classList.remove("visible");
     }
 
     function submitOrder() {
         var valid = true;
         clearFormErrors();
+
         var nameVal = document.getElementById("nameInput").value.trim();
-        var tgVal   = document.getElementById("tgInput").value.trim();
-        if (!nameVal) { document.getElementById("nameInput").classList.add("has-error"); document.getElementById("nameError").classList.add("visible"); valid = false; }
-        if (!tgVal)   { document.getElementById("tgInput").classList.add("has-error");   document.getElementById("tgError").classList.add("visible");   valid = false; }
+        var tgVal = document.getElementById("tgInput").value.trim();
+
+        if (!nameVal) {
+            document.getElementById("nameInput").classList.add("has-error");
+            document.getElementById("nameError").classList.add("visible");
+            valid = false;
+        }
+        if (!tgVal) {
+            document.getElementById("tgInput").classList.add("has-error");
+            document.getElementById("tgError").classList.add("visible");
+            valid = false;
+        }
+
         if (!valid) return;
 
-        var lines = ["НОВЫЙ ЗАКАЗ","──────────────","Клиент: " + nameVal,"Telegram: " + tgVal,"──────────────","Товары:"];
+        var lines = [
+            "\uD83D\uDED2 НОВЫЙ ЗАКАЗ",
+            "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+            "\uD83D\uDC64 Клиент: " + nameVal,
+            "\uD83D\uDCAC Telegram: " + tgVal,
+            "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+            "\uD83D\uDED2 Товары:"
+        ];
         for (var i = 0; i < state.cart.length; i++) {
             var item = state.cart[i];
-            lines.push("  " + item.product.name + " x" + item.quantity + " — " + formatPrice(item.product.price * item.quantity));
+            lines.push("  \u2022 " + item.product.name + " x" + item.quantity + " \u2014 " + formatPrice(item.product.price * item.quantity));
         }
-        lines.push("──────────────");
-        lines.push("Итого: " + formatPrice(getCartTotal()));
-        lines.push("Доставка: оплачивается отдельно клиентом");
+        lines.push("\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500");
+        lines.push("\uD83D\uDCB0 Итого: " + formatPrice(getCartTotal()));
+        lines.push("\uD83D\uDE9A Доставка: оплачивается отдельно клиентом");
+
         var orderMessage = lines.join("\n");
 
-        if (tg && tg.sendData) { try { tg.sendData(orderMessage); } catch (e) {} }
+        if (tg && tg.sendData) {
+            try { tg.sendData(orderMessage); } catch (e) {}
+        }
 
         closeCheckoutModal();
         closeCart();
@@ -1307,8 +1445,11 @@
         updateAddButtonsOnCards();
 
         document.getElementById("successOverlay").classList.add("open");
+
         setTimeout(function() {
-            if (tg && tg.openTelegramLink) tg.openTelegramLink(DIRECT_CHAT_LINK);
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(DIRECT_CHAT_LINK);
+            }
         }, 1500);
     }
 
@@ -1331,8 +1472,9 @@
        ПОИСК
        ================================================================ */
     function toggleSearch(forceClose) {
-        var bar    = document.getElementById("searchBar");
+        var bar = document.getElementById("searchBar");
         var filter = document.getElementById("filterBar");
+
         if (forceClose || state.isSearchOpen) {
             state.isSearchOpen = false;
             bar.classList.remove("open");
@@ -1352,42 +1494,25 @@
        СОРТИРОВКА
        ================================================================ */
     function cycleSortMode() {
-        if      (state.sortMode === "none") { state.sortMode = "asc";  showToast("Сортировка: Дешевле"); }
-        else if (state.sortMode === "asc")  { state.sortMode = "desc"; showToast("Сортировка: Дороже"); }
-        else                                { state.sortMode = "none"; showToast("Сортировка сброшена"); }
+        if (state.sortMode === "none") {
+            state.sortMode = "asc";
+            showToast("Сортировка: Дешевле");
+        } else if (state.sortMode === "asc") {
+            state.sortMode = "desc";
+            showToast("Сортировка: Дороже");
+        } else {
+            state.sortMode = "none";
+            showToast("Сортировка сброшена");
+        }
+
         var btn = document.getElementById("sortBtn");
-        if (state.sortMode !== "none") btn.classList.add("sort-active");
-        else btn.classList.remove("sort-active");
+        if (state.sortMode !== "none") {
+            btn.classList.add("sort-active");
+        } else {
+            btn.classList.remove("sort-active");
+        }
+
         renderCatalog();
-    }
-
-    /* ================================================================
-       DEEP LINK: открываем товар при запуске через shared-ссылку
-       Telegram передаёт startapp-параметр в tg.initDataUnsafe.start_param
-       или в URL как ?startapp=product_<id>
-       ================================================================ */
-    function checkDeepLink() {
-        var startParam = "";
-
-        // 1. Telegram WebApp API
-        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
-            startParam = tg.initDataUnsafe.start_param;
-        }
-
-        // 2. Fallback: URL query-параметр (для тестирования в браузере)
-        if (!startParam) {
-            var urlParams = new URLSearchParams(window.location.search);
-            startParam = urlParams.get("startapp") || "";
-        }
-
-        if (startParam && startParam.indexOf("product_") === 0) {
-            var productId = parseInt(startParam.replace("product_", ""), 10);
-            var product = findProduct(productId);
-            if (product) {
-                // Небольшая задержка, чтобы каталог успел отрисоваться
-                setTimeout(function() { openProductDetail(product); }, 150);
-            }
-        }
     }
 
     /* ================================================================
@@ -1405,9 +1530,19 @@
 
         document.getElementById("cartBtn").addEventListener("click", openCart);
 
+        /* Закреплённый чип Избранного */
+        document.getElementById("favStickyChip").addEventListener("click", function() {
+            state.selectedCategory = "fav";
+            renderFilterBar();
+            updateFavStickyChip();
+            renderCatalog();
+        });
+
+        /* Детали — закрытие */
         document.getElementById("detailBackBtn").addEventListener("click", closeProductDetail);
         document.getElementById("detailCloseBtn").addEventListener("click", closeProductDetail);
 
+        /* Детали — добавить в корзину */
         document.getElementById("detailAddBtn").addEventListener("click", function() {
             if (!state.selectedProduct) return;
             var p = state.selectedProduct;
@@ -1423,13 +1558,16 @@
             showToast("Добавлено в корзину");
         });
 
+        /* Корзина — закрытие */
         document.getElementById("cartBackBtn").addEventListener("click", closeCart);
 
+        /* Backdrop */
         document.getElementById("overlayBackdrop").addEventListener("click", function() {
             if (state.currentView === "detail") closeProductDetail();
             else if (state.currentView === "cart") closeCart();
         });
 
+        /* Checkout */
         document.getElementById("checkoutModalBg").addEventListener("click", closeCheckoutModal);
         document.getElementById("submitOrderBtn").addEventListener("click", submitOrder);
 
@@ -1441,11 +1579,34 @@
             document.getElementById("tgInput").classList.remove("has-error");
             document.getElementById("tgError").classList.remove("visible");
             var val = document.getElementById("tgInput").value;
-            if (val.length > 0 && val.charAt(0) !== "@") document.getElementById("tgInput").value = "@" + val;
+            if (val.length > 0 && val.charAt(0) !== "@") {
+                document.getElementById("tgInput").value = "@" + val;
+            }
         });
 
+        /* Success */
         document.getElementById("successBackBtn").addEventListener("click", closeSuccessOverlay);
         document.getElementById("successChatBtn").addEventListener("click", openChannelChat);
+    }
+
+    /* ================================================================
+       ОБРАБОТКА DEEP-LINK (startapp=product_X)
+       ================================================================ */
+    function handleStartParam() {
+        if (!tg) return;
+        try {
+            var startParam = tg.initDataUnsafe && tg.initDataUnsafe.start_param;
+            if (startParam && startParam.indexOf("product_") === 0) {
+                var productId = parseInt(startParam.replace("product_", ""));
+                var product = findProduct(productId);
+                if (product) {
+                    /* Небольшая задержка, чтобы UI успел отрисоваться */
+                    setTimeout(function() {
+                        openProductDetail(product);
+                    }, 400);
+                }
+            }
+        } catch (e) {}
     }
 
     /* ================================================================
@@ -1459,17 +1620,21 @@
         if (savedFavs) state.favorites = savedFavs;
 
         renderFilterBar();
+        updateFavStickyChip();
         renderCatalog();
         updateCartBadge();
         initEventListeners();
         updateTelegramBackButton();
 
-        // Проверяем deep link после инициализации
-        checkDeepLink();
+        /* Проверяем, не пришёл ли deep-link на конкретный товар */
+        handleStartParam();
     }
 
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-    else init();
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
     </script>
 </body>
 </html>
