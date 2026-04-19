@@ -1401,7 +1401,7 @@
         for (var j = 0; j < errors.length; j++) errors[j].classList.remove("visible");
     }
 
-    function submitOrder() {
+        function submitOrder() {
         var valid = true;
         clearFormErrors();
 
@@ -1439,26 +1439,30 @@
 
         var orderMessage = lines.join("\n");
 
+        /* Отправляем данные боту */
         if (tg && tg.sendData) {
-            try { tg.sendData(orderMessage); } catch (e) {}
+            try {
+                tg.sendData(orderMessage);
+            } catch (e) {
+                console.log("sendData ошибка:", e);
+            }
+        } else {
+            console.log("sendData недоступен — приложение не через бота");
         }
 
+        /* Закрываем все панели */
         closeCheckoutModal();
         closeCart();
         closeProductDetail();
 
+        /* Очищаем корзину */
         state.cart = [];
         saveToStorage("cart", state.cart);
         updateCartBadge();
         updateAddButtonsOnCards();
 
+        /* Показываем экран успеха */
         document.getElementById("successOverlay").classList.add("open");
-
-        setTimeout(function() {
-            if (tg && tg.openTelegramLink) {
-                tg.openTelegramLink(DIRECT_CHAT_LINK);
-            }
-        }, 1500);
     }
 
     function closeSuccessOverlay() {
