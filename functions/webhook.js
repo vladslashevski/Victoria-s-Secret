@@ -1,5 +1,5 @@
 const BOT_TOKEN = '8559711885:AAE4vRXIKYa58h4NQzwuiI-m_58b1ui5gBk';
-const CHANNEL_ID = '-100ВСТАВЬТЕ_СЮДА_ID_КАНАЛА';
+const CHANNEL_ID = '-1003743206762';
 
 export async function onRequestPost(context) {
   const update = await context.request.json();
