@@ -1458,11 +1458,11 @@
     };
 
     // Отправляем POST-запрос на Worker
-    fetch('https://victoriasecret.vlad-slashevski.workers.dev/send-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-    })
+    fetch('https://viktoriabot.vlad-slashevski.workers.dev/send-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orderData)
+})
     .then(function(response) {
         if (!response.ok) {
             console.error('Ошибка отправки уведомления продавцу');
