@@ -1402,75 +1402,101 @@
     }
 
         function submitOrder() {
-        var valid = true;
-        clearFormErrors();
+    var valid = true;
+    clearFormErrors();
 
-        var nameVal = document.getElementById("nameInput").value.trim();
-        var tgVal = document.getElementById("tgInput").value.trim();
+    var nameVal = document.getElementById("nameInput").value.trim();
+    var tgVal = document.getElementById("tgInput").value.trim();
 
-        if (!nameVal) {
-            document.getElementById("nameInput").classList.add("has-error");
-            document.getElementById("nameError").classList.add("visible");
-            valid = false;
-        }
-        if (!tgVal) {
-            document.getElementById("tgInput").classList.add("has-error");
-            document.getElementById("tgError").classList.add("visible");
-            valid = false;
-        }
-
-        if (!valid) return;
-
-        var lines = [
-            "\uD83D\uDED2 НОВЫЙ ЗАКАЗ",
-            "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
-            "\uD83D\uDC64 Клиент: " + nameVal,
-            "\uD83D\uDCAC Telegram: " + tgVal,
-            "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
-            "\uD83D\uDED2 Товары:"
-        ];
-        for (var i = 0; i < state.cart.length; i++) {
-            var item = state.cart[i];
-            lines.push("  \u2022 " + item.product.name + " x" + item.quantity + " \u2014 " + formatPrice(item.product.price * item.quantity));
-        }
-        lines.push("\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500");
-        lines.push("\uD83D\uDCB0 Итого: " + formatPrice(getCartTotal()));
-        lines.push("\uD83D\uDE9A Доставка: оплачивается отдельно клиентом");
-
-        var orderMessage = lines.join("\n");
-
-        /* Отправляем данные боту */
-        if (tg && tg.sendData) {
-            try {
-                tg.sendData(orderMessage);
-            } catch (e) {
-                console.log("sendData ошибка:", e);
-            }
-        } else {
-            console.log("sendData недоступен — приложение не через бота");
-        }
-
-        /* Закрываем все панели */
-        closeCheckoutModal();
-        closeCart();
-        closeProductDetail();
-
-        /* Очищаем корзину */
-        state.cart = [];
-        saveToStorage("cart", state.cart);
-        updateCartBadge();
-        updateAddButtonsOnCards();
-
-        /* Показываем экран успеха */
-        document.getElementById("successOverlay").classList.add("open");
+    if (!nameVal) {
+        document.getElementById("nameInput").classList.add("has-error");
+        document.getElementById("nameError").classList.add("visible");
+        valid = false;
+    }
+    if (!tgVal) {
+        document.getElementById("tgInput").classList.add("has-error");
+        document.getElementById("tgError").classList.add("visible");
+        valid = false;
     }
 
-    function closeSuccessOverlay() {
-        document.getElementById("successOverlay").classList.remove("open");
-        state.currentView = "catalog";
-        updateTelegramBackButton();
-        renderCatalog();
+    if (!valid) return;
+
+    // --- ФОРМИРУЕМ СООБЩЕНИЕ ДЛЯ TELEGRAM (для отображения на экране успеха) ---
+    var lines = [
+        "\uD83D\uDED2 НОВЫЙ ЗАКАЗ",
+        "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "\uD83D\uDC64 Клиент: " + nameVal,
+        "\uD83D\uDCAC Telegram: " + tgVal,
+        "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "\uD83D\uDED2 Товары:"
+    ];
+    for (var i = 0; i < state.cart.length; i++) {
+        var item = state.cart[i];
+        lines.push("  \u2022 " + item.product.name + " x" + item.quantity + " \u2014 " + formatPrice(item.product.price * item.quantity));
     }
+    lines.push("\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500");
+    lines.push("\uD83D\uDCB0 Итого: " + formatPrice(getCartTotal()));
+    lines.push("\uD83D\uDE9A Доставка: оплачивается отдельно клиентом");
+
+    var orderMessage = lines.join("\n");
+
+    // --- ОТПРАВКА ЗАКАЗА НА CLOUDFLARE WORKER (ВЕБХУК) ---
+    // Формируем данные для отправки в структурированном виде
+    var orderData = {
+        name: nameVal,
+        telegram: tgVal,
+        items: state.cart.map(function(item) {
+            return {
+                name: item.product.name,
+                quantity: item.quantity,
+                price: item.product.price,
+                total: item.product.price * item.quantity
+            };
+        }),
+        total: getCartTotal(),
+        totalFormatted: formatPrice(getCartTotal())
+    };
+
+    // Отправляем POST-запрос на Worker
+    fetch('https://victoriasecret.vlad-slashevski.workers.dev/send-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+    })
+    .then(function(response) {
+        if (!response.ok) {
+            console.error('Ошибка отправки уведомления продавцу');
+        }
+        // В любом случае продолжаем оформление
+    })
+    .catch(function(error) {
+        console.error('Ошибка сети при отправке уведомления:', error);
+    });
+
+    // --- ОТПРАВКА ЧЕРЕЗ TELEGRAM WEB APP (если открыто внутри бота) ---
+    if (tg && tg.sendData) {
+        try {
+            tg.sendData(orderMessage);
+        } catch (e) {
+            console.log("sendData ошибка:", e);
+        }
+    } else {
+        console.log("sendData недоступен — приложение не через бота, но уведомление продавцу отправлено через Worker");
+    }
+
+    // --- ЗАКРЫВАЕМ ПАНЕЛИ И ОЧИЩАЕМ КОРЗИНУ ---
+    closeCheckoutModal();
+    closeCart();
+    closeProductDetail();
+
+    state.cart = [];
+    saveToStorage("cart", state.cart);
+    updateCartBadge();
+    updateAddButtonsOnCards();
+
+    // --- ПОКАЗЫВАЕМ ЭКРАН УСПЕХА ---
+    document.getElementById("successOverlay").classList.add("open");
+}
 
     /* ================================================================
        НАВИГАЦИЯ
